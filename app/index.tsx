@@ -39,8 +39,17 @@ export default function Index() {
         <Text style={styles.buttonText}>Go to profile</Text>
       </TouchableOpacity>
 
-      
 
+ {/* NEW BUTTON: Settings Page */}
+      {/* Navigate to settings.tsx */}
+       
+       <TouchableOpacity 
+       style={styles.button}
+       onPress={() => router.push("/settings")}
+       >
+        <Text style={styles.buttonText}>Go to Settings</Text>
+       </TouchableOpacity>
+       
 
 
 
