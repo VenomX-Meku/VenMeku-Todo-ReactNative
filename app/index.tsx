@@ -18,6 +18,19 @@ export default function Index() {
         <Text style={styles.buttonText}>Go to My Tasks</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+      style={styles.button}
+      onPress={() => router.push("/detail")} //Navigate to detail.tsx
+      
+        ><Text style={styles.buttonText}>Go to detail page</Text>      
+        </TouchableOpacity>
+
+
+
+
+
+
+
       <Text style={styles.quote}>
         “Productivity is never an accident — it’s always the result of a
         commitment to excellence.”
