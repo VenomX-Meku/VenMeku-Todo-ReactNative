@@ -49,7 +49,21 @@ export default function Index() {
        >
         <Text style={styles.buttonText}>Go to Settings</Text>
        </TouchableOpacity>
-       
+
+
+
+{/* NEW BUTTON: Modal Page */}
+      {/* Navigate to modal.tsx */}
+
+<TouchableOpacity 
+style={styles.button}
+onPress={() => router.push("/modal")}
+>
+  <Text style={styles.buttonText}>Open Modal</Text>
+</TouchableOpacity>
+
+
+
 
 
 
