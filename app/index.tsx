@@ -18,12 +18,28 @@ export default function Index() {
         <Text style={styles.buttonText}>Go to My Tasks</Text>
       </TouchableOpacity>
 
+
+            {/* NEW BUTTON: Detail Page */}
+      {/* I added this so you can navigate to the Detail page */}
+
       <TouchableOpacity
       style={styles.button}
       onPress={() => router.push("/detail")} //Navigate to detail.tsx
       
         ><Text style={styles.buttonText}>Go to detail page</Text>      
         </TouchableOpacity>
+
+{/* NEW BUTTON: Profile Page */}
+      {/* Navigate to profile.tsx */} 
+
+      <TouchableOpacity
+      style={styles.button}
+      onPress={() => router.push("/profile")}
+      >
+        <Text style={styles.buttonText}>Go to profile</Text>
+      </TouchableOpacity>
+
+      
 
 
 
