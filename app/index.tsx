@@ -1,54 +1,73 @@
+
+
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
-    const router = useRouter();
+  const router = useRouter();
 
-    return (
-  <View style={styles.container}>
-  <Text style={styles.title}>Wellcome, Meku</Text> 
-  <Text style={styles.subtitle}>Organize your day butifully</Text> 
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome, Meku 👋</Text>
+      <Text style={styles.subtitle}>Organize your day beautifully 🌟</Text>
 
-    <TouchableOpacity
-    style={StyleSheet.button}
-    onPress={() => router.push("/tasks")}
-    > 
-    <Text style={StyleSheet.buttonText}>Go to My Task</Text>
-    </TouchableOpacity>
-    
-    <Text style={Styles.quote}>
-        Productivity is never an acccident - it is always the result of a commitment to exellent. do not stop Meku
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.push("/tasks")}
+      >
+        <Text style={styles.buttonText}>Go to My Tasks</Text>
+      </TouchableOpacity>
 
-
+      <Text style={styles.quote}>
+        “Productivity is never an accident — it’s always the result of a
+        commitment to excellence.”
       </Text>
     </View>
   );
 }
-  
-
-const style = StyleSheet.create({ 
-
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        borderBlockColor: "#ffb84d",
-        padding: 20,
-    },
 
 
-    title: {
-        fontSize: 28,
-        fontWeight: "bold",
-        color:" #fff",
-        marginBottom: 10,
-    },
 
-    subtitle: {
-        fontSize: 16,
-        color: "#fff",
-        marginBottom: 30,
-    },
 
-})
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#d6912aff",
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#fff",
+    marginBottom: 30,
+  },
+  button: {
+    backgroundColor: "#f9f9f9ff",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "#ff9100",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  quote: {
+    fontSize: 14,
+    color: "#fff",
+    marginTop: 50,
+    fontStyle: "italic",
+    textAlign: "center",
+  },
+});
