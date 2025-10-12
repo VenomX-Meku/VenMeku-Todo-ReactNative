@@ -305,3 +305,5 @@ const styles = StyleSheet.create({
   darkModeText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
   textDark: { color: "#fff" },
 });
+
+
