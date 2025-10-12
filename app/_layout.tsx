@@ -5,11 +5,11 @@ export default function RootLayout() {
   return (
     <>
       {/* 🔸 NEW: Modern status bar */}
-      <StatusBar style="light" backgroundColor="#6e4417ff" />
+      <StatusBar style="light" backgroundColor="#0f2a73ff" />
 
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: "#6e4417ff" },
+          headerStyle: { backgroundColor: "#0f2a73ff" },
           headerTintColor: "#fff",
           headerTitleStyle: { fontWeight: "bold" },
           animation: "slide_from_right", // 🔸 NEW: Smooth screen transition

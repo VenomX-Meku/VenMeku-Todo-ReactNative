@@ -103,22 +103,93 @@ export default function SettingsScreen() {
           { backgroundColor: darkMode ? "#2c2c2c" : "#fff" },
         ]}
       >
+
+
+
+<Text
+          style={[
+            styles.infoText,
+            { color: darkMode ? "#bbb" : "#555", fontSize: 40, },
+          ]}
+        >
+          
+💻 
+
+
+
+        </Text>
+
+
+ <Text
+          style={[
+            styles.infoText,
+            { color: darkMode ? "#bbb" : "#555" },
+          ]}
+        >
+          
+
+👨‍💻 Developed by: Mekuanint (Meku)
+
+
+        </Text>
+
+
+
+
         <Text
           style={[
             styles.infoText,
             { color: darkMode ? "#fff" : "#333" },
           ]}
         >
+
+
           📱 App Version: <Text style={styles.highlight}>1.0.0</Text>
         </Text>
-        <Text
+
+
+
+
+
+
+<Text
           style={[
             styles.infoText,
             { color: darkMode ? "#bbb" : "#555" },
           ]}
         >
-          Developed by Mekuanint (Meku)
+💙 Built with: React Native & TypeScript
+
         </Text>
+
+
+
+<Text
+          style={[
+            styles.infoText,
+            { color: darkMode ? "#bbb" : "#555" },
+          ]}
+        >
+📧 Support: venapp@gmail.com
+
+        </Text>
+
+
+
+<Text
+          style={[
+            styles.infoText,
+            { color: darkMode ? "#bbb" : "#555" },
+          ]}
+        >
+© 2025 VenMeku Tech — All rights reserved.
+
+        </Text>
+
+
+
+
+
       </View>
     </View>
   );

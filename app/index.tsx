@@ -1,7 +1,10 @@
-// 🔹 UPDATED: Added Glowing Background (like Modal)
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Switch,
@@ -13,23 +16,99 @@ import {
 export default function Index() {
   const router = useRouter();
 
-  // 🔹 QUOTE FEATURE
+  const [user, setUser] = useState<string | null>(null);
+  const [userPhoto, setUserPhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser.name);
+          setUserPhoto(parsedUser.photoUri || null);
+        }
+      } catch (error) {
+        console.log("Error loading user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("user");
+  };
+
+  const savePhoto = async (uri: string) => {
+    setUserPhoto(uri);
+    const storedUser = await AsyncStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      parsedUser.photoUri = uri;
+      await AsyncStorage.setItem("user", JSON.stringify(parsedUser));
+    }
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission required", "Permission to access photos is needed.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      savePhoto(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission required", "Permission to access camera is needed.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      savePhoto(result.assets[0].uri);
+    }
+  };
+
+  const handleProfilePress = () => {
+    Alert.alert("Profile Photo", "Choose an option", [
+      { text: "Take Photo", onPress: takePhoto },
+      { text: "Choose from Gallery", onPress: pickImage },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
   const [quote, setQuote] = useState(
     "Productivity is never an accident — it’s always the result of a commitment to excellence."
   );
   const quotes = [
-    "Success is the sum of small efforts repeated daily.",
-    "Don’t watch the clock; do what it does. Keep going.",
-    "Your future is created by what you do today, not tomorrow.",
-    "Discipline is choosing between what you want now and what you want most.",
+    "ሕይወት አትጠብቅ እንደሚጀምር፣ አንተ አሁን ጀምር።",
+    "ትንሽ ድርጊት በየቀኑ ትልቅ ለውጥ ያመጣል።",
+    "እውነት ተንገድ ቢያንስ ትክክለኛ ነው።",
+    "ተስፋ ያለብህ እስካለህ ድረስ መንገድ አለ።",
+    "ስለ ነገ አትጨነቅ፤ ዛሬን በመልካም ተጠቀም።",
+    "የምታስብ ነገር ሁሉ የምታደርገውን ያቀድማል።",
+    "በትንሹ መጀመር ትልቅ ነገር እንዲሆን ያደርጋል።",
   ];
   const changeQuote = () => {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     setQuote(quotes[randomIndex]);
   };
 
-  // 🔹 TIMER FEATURE
-  const [secondsLeft, setSecondsLeft] = useState(300); // 5 minutes
+  const [secondsLeft, setSecondsLeft] = useState(300);
   useEffect(() => {
     const timer = setInterval(() => {
       setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -42,124 +121,96 @@ export default function Index() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  // 🔹 DARK MODE
   const [darkMode, setDarkMode] = useState(false);
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
-  // 🔹 DAILY TIP
-  const [tip, setTip] = useState("Stay focused and take short breaks!");
-  const tips = [
-    "Break tasks into smaller steps to avoid overwhelm.",
-    "Prioritize the most important task first.",
-    "Take a short walk to refresh your mind.",
-    "Drink water regularly to stay alert.",
-    "Celebrate small wins every day!",
-  ];
-  const changeTip = () => {
-    const randomIndex = Math.floor(Math.random() * tips.length);
-    setTip(tips[randomIndex]);
-  };
-
   return (
     <View style={styles.backgroundContainer}>
-      {/* ✨ Glowing circles background */}
       <View style={styles.glowCircle1} />
       <View style={styles.glowCircle2} />
 
-      {/* 🔹 Main content */}
       <View style={[styles.container, darkMode && styles.containerDark]}>
+        {/* Dark Mode Switch (Top Right Corner) */}
+        <View style={styles.darkModeToggle}>
+          <Switch
+            value={darkMode}
+            onValueChange={toggleDarkMode}
+            thumbColor={darkMode ? "#fff" : "#ff9100"}
+            trackColor={{ true: "#333", false: "#ccc" }}
+          />
+        </View>
+
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* 🔹 HEADER */}
+          {/* PROFILE PHOTO */}
+          <View style={styles.profileWrapper}>
+            {userPhoto ? (
+              <TouchableOpacity onPress={handleProfilePress} activeOpacity={0.8}>
+                <Image source={{ uri: userPhoto }} style={styles.profilePhotoTopRight} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={handleProfilePress}
+                style={styles.placeholderPhotoTopRight}
+                activeOpacity={0.8}
+              >
+                <Text style={{ color: "#fff", fontSize: 12 }}>Add</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* HEADER (moved closer to profile) */}
           <View style={styles.headerSection}>
             <Text style={[styles.title, darkMode && styles.textDark]}>
-              Welcome!
+              Welcome{user ? `, ${user}! 👋` : "!"}
             </Text>
+
+            {user && (
+              <TouchableOpacity onPress={logout} style={{ marginTop: 4 }}>
+                <Text style={styles.logoutText}>Logout</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
-          {/* 🔹 NAVIGATION BUTTONS */}
+          {/* BUTTONS */}
           <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push("/tasks")}
-            >
+            <TouchableOpacity style={styles.button} onPress={() => router.push("/tasks")}>
               <Text style={styles.buttonText}>Tasks</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push("/detail")}
-            >
+
+            <TouchableOpacity style={styles.button} onPress={() => router.push("/detail")}>
               <Text style={styles.buttonText}>Detail</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push("/profile")}
-            >
+
+            <TouchableOpacity style={styles.button} onPress={() => router.push("/profile")}>
               <Text style={styles.buttonText}>Profile</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push("/settings")}
-            >
+
+            <TouchableOpacity style={styles.button} onPress={() => router.push("/settings")}>
               <Text style={styles.buttonText}>Settings</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push("/modal")}
-            >
-              <Text style={styles.buttonText}>Modal</Text>
-            </TouchableOpacity>
           </View>
 
-          {/* 🔹 QUOTE FEATURE */}
+          {/* TIMER */}
+          <View style={styles.timerCircle}>
+            <View style={styles.timerSection}>
+              <Text style={[styles.timerTitle, darkMode && styles.textDark]}>
+                ⏰ Next Task In
+              </Text>
+              <Text style={[styles.timerText, darkMode && styles.textDark]}>
+                {formatTime(secondsLeft)}
+              </Text>
+              <Text style={[styles.timerHint, darkMode && styles.textDark]}>
+                Stay ready to focus!
+              </Text>
+            </View>
+          </View>
+
+          {/* QUOTE */}
           <View style={styles.quoteSection}>
-            <Text style={[styles.quote, darkMode && styles.textDark]}>
-              {quote}
-            </Text>
-            <TouchableOpacity
-              style={styles.refreshButton}
-              onPress={changeQuote}
-            >
+            <Text style={[styles.quote, darkMode && styles.textDark]}>{quote}</Text>
+            <TouchableOpacity style={styles.refreshButton} onPress={changeQuote}>
               <Text style={styles.refreshText}>🔄 Refresh Quote</Text>
             </TouchableOpacity>
-          </View>
-
-          {/* 🔹 REMINDER TIMER */}
-          <View style={styles.timerSection}>
-            <Text style={[styles.timerTitle, darkMode && styles.textDark]}>
-              ⏰ Next Task In
-            </Text>
-            <Text style={[styles.timerText, darkMode && styles.textDark]}>
-              {formatTime(secondsLeft)}
-            </Text>
-            <Text style={[styles.timerHint, darkMode && styles.textDark]}>
-              Stay ready to focus!
-            </Text>
-          </View>
-
-          {/* 🔹 DAILY TIP */}
-          <View style={styles.tipSection}>
-            <Text style={[styles.tipTitle, darkMode && styles.textDark]}>
-              💡 Daily Tip
-            </Text>
-            <Text style={[styles.tipText, darkMode && styles.textDark]}>
-              {tip}
-            </Text>
-            <TouchableOpacity style={styles.tipButton} onPress={changeTip}>
-              <Text style={styles.tipButtonText}>🔄 Refresh Tip</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* 🔹 DARK MODE SWITCH */}
-          <View style={styles.darkModeSection}>
-            <Text style={[styles.darkModeText, darkMode && styles.textDark]}>
-              🌙 Dark Mode
-            </Text>
-            <Switch
-              value={darkMode}
-              onValueChange={toggleDarkMode}
-              thumbColor={darkMode ? "#fff" : "#ff9100"}
-              trackColor={{ true: "#333", false: "#ccc" }}
-            />
           </View>
         </ScrollView>
       </View>
@@ -167,7 +218,6 @@ export default function Index() {
   );
 }
 
-// 🔹 STYLES
 const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
@@ -197,7 +247,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "rgba(15, 25, 35, 0.8)", // transparent overlay for content
+    backgroundColor: "rgba(15, 25, 35, 0.8)",
     padding: 20,
     width: "100%",
   },
@@ -209,26 +259,50 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
   },
+  darkModeToggle: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
   headerSection: {
-    alignItems: "center",
-    marginTop: 40,
+    marginTop: 10, // 🟢 reduced from 80 to 10 to pull closer
     marginBottom: 10,
+    width: "100%",
+    alignItems: "center",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 8,
+  profileWrapper: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 10, // 🟢 reduced from 30 to 10 for tighter spacing
   },
+  profilePhotoTopRight: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: "#FFD166",
+  },
+  placeholderPhotoTopRight: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#888",
+    borderWidth: 2,
+    borderColor: "#FFD166",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: { fontSize: 22, fontWeight: "bold", color: "#fff", marginBottom: 4 },
+  logoutText: { color: "#FFD166", fontWeight: "bold", marginTop: 4 },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
     flexWrap: "wrap",
     marginBottom: 20,
   },
   button: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ff9100",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 15,
@@ -238,11 +312,25 @@ const styles = StyleSheet.create({
     elevation: 5,
     margin: 5,
   },
-  buttonText: {
-    color: "#ff9100",
-    fontSize: 14,
-    fontWeight: "bold",
+  buttonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  timerCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    borderWidth: 4,
+    borderColor: "#FFD166",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    shadowColor: "#FFD166",
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    marginVertical: 30,
   },
+  timerSection: { alignItems: "center" },
+  timerTitle: { fontSize: 16, fontWeight: "bold", color: "#fff", marginBottom: 8 },
+  timerText: { fontSize: 32, fontWeight: "bold", color: "#fff" },
+  timerHint: { fontSize: 14, color: "#fff", marginTop: 6, fontStyle: "italic" },
   quoteSection: { alignItems: "center", marginTop: 30 },
   quote: {
     fontSize: 14,
@@ -259,51 +347,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   refreshText: { color: "#ff9100", fontWeight: "bold" },
-  timerSection: { alignItems: "center", marginTop: 40, marginBottom: 30 },
-  timerTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 8,
-  },
-  timerText: { fontSize: 32, fontWeight: "bold", color: "#fff" },
-  timerHint: {
-    fontSize: 14,
-    color: "#fff",
-    marginTop: 6,
-    fontStyle: "italic",
-  },
-  tipSection: { alignItems: "center", marginTop: 30, marginBottom: 30 },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#FFD166",
-    marginBottom: 8,
-  },
-  tipText: {
-    fontSize: 14,
-    color: "#fff",
-    textAlign: "center",
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  tipButton: {
-    backgroundColor: "#FFD166",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  tipButtonText: { color: "#0D1F2D", fontWeight: "bold" },
-  darkModeSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "60%",
-    marginBottom: 50,
-    marginTop: 20,
-  },
-  darkModeText: { fontSize: 16, fontWeight: "bold", color: "#fff" },
   textDark: { color: "#fff" },
 });
-
-
