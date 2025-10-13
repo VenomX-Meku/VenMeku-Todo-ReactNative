@@ -23,15 +23,17 @@ export default function Index() {
   );
   const [secondsLeft, setSecondsLeft] = useState(300);
 
+  // Load session user on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const storedUser = await AsyncStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser.name);
+          setUser(parsedUser.name || null);
           setUserPhoto(parsedUser.photoUri || null);
         } else {
+          // no session -> go to login
           setTimeout(() => router.replace("/Login"), 500);
         }
       } catch (error) {
@@ -41,6 +43,7 @@ export default function Index() {
     fetchUser();
   }, [router]);
 
+  // Timer countdown
   useEffect(() => {
     const timer = setInterval(() => {
       setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -71,32 +74,84 @@ export default function Index() {
     setQuote(quotes[randomIndex]);
   };
 
+  // LOGOUT
+  // Keep users list intact and only remove the session key "user".
+  // This preserves saved user data (including photoUri) for future logins.
   const logout = async () => {
-    try {
-      await AsyncStorage.removeItem("user");
-      setUser(null);
-      setUserPhoto(null);
-      Alert.alert("Logout Successful", "You have been logged out successfully!", [
-        { text: "OK", onPress: () => router.replace("/Login") },
-      ]);
-    } catch (error) {
-      console.log("Logout error:", error);
-    }
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to log out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              // Remove only the session key; keep the users array and user data intact.
+              await AsyncStorage.removeItem("user");
+              setUser(null);
+              setUserPhoto(null);
+              // Navigate to Login
+              router.replace("/Login");
+            } catch (error) {
+              console.log("Logout error:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
+  // SAVE PHOTO
+  // Update both the session `user` object and the `users` list (if exists).
+  // This ensures the photo is persisted across logins and logouts.
   const savePhoto = async (uri: string) => {
     setUserPhoto(uri);
     try {
+      // Update session user (if present)
       const storedUser = await AsyncStorage.getItem("user");
-      let updatedUser;
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        parsedUser.photoUri = uri;
-        updatedUser = parsedUser;
-      } else {
-        updatedUser = { name: user || "Guest", photoUri: uri };
+        const updatedSessionUser = { ...parsedUser, photoUri: uri };
+        await AsyncStorage.setItem("user", JSON.stringify(updatedSessionUser));
       }
-      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+
+      // Update users list (so photo persists for next login)
+      const storedUsers = await AsyncStorage.getItem("users");
+      if (storedUsers) {
+        const users = JSON.parse(storedUsers) as any[];
+        // If we have a logged-in name, update that user's photo; else try match by session
+        const currentName = storedUser ? JSON.parse(storedUser).name : user;
+        if (currentName) {
+          const idx = users.findIndex((u) => u.name === currentName);
+          if (idx !== -1) {
+            users[idx].photoUri = uri;
+            await AsyncStorage.setItem("users", JSON.stringify(users));
+            return;
+          }
+        }
+        // If no matching name found, optionally add/update the first user entry
+        // (This is conservative and won't delete existing accounts)
+        if (users.length > 0) {
+          users[0].photoUri = users[0].photoUri || uri;
+          await AsyncStorage.setItem("users", JSON.stringify(users));
+        } else {
+          // create a users array with the photo if none existed
+          const newUser = { name: user || "Guest", password: "", photoUri: uri };
+          await AsyncStorage.setItem("users", JSON.stringify([newUser]));
+        }
+      } else {
+        // No users array yet — create one with current session (if present) or a guest record
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          const u = { name: parsed.name || "Guest", password: parsed.password || "", photoUri: uri };
+          await AsyncStorage.setItem("users", JSON.stringify([u]));
+        } else {
+          const u = { name: user || "Guest", password: "", photoUri: uri };
+          await AsyncStorage.setItem("users", JSON.stringify([u]));
+        }
+      }
     } catch (error) {
       console.log("Error saving photo:", error);
     }
