@@ -268,10 +268,10 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  backgroundContainer: { flex: 1, backgroundColor: "#203c58ff", justifyContent: "center", alignItems: "center" },
+  backgroundContainer: { flex: 1, backgroundColor: "#183d75ff", justifyContent: "center", alignItems: "center" },
   glowCircle1: { position: "absolute", width: 300, height: 300, backgroundColor: "#ffde9c", borderRadius: 150, opacity: 0.2, top: 60, left: 40 },
   glowCircle2: { position: "absolute", width: 350, height: 350, backgroundColor: "#94560a", borderRadius: 175, opacity: 0.15, bottom: 60, right: 40 },
-  container: { flex: 1, backgroundColor: "rgba(15,25,35,0.8)", width: "100%", padding: 20 },
+  container: { flex: 1, backgroundColor: "rgba(76, 56, 21, 0.8)", width: "100%", padding: 20 },
   containerDark: { backgroundColor: "rgba(30,30,30,0.85)" },
   scrollContent: { flexGrow: 1, alignItems: "center", paddingBottom: 50 },
   darkModeToggle: { position: "absolute", top: 40, right: 20, zIndex: 10 },
