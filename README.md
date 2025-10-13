@@ -1,50 +1,162 @@
-# Welcome to your Expo app 👋
+<p align="center">
+  <img src="./screenshots/app-icon.png" alt="VenMeku Todo Logo" width="120"/>
+</p>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<h1 align="center">📝 VenMeku Todo</h1>
+<p align="center">
+  A sleek and modern <b>To-Do app</b> built with <b>React Native</b> & <b>TypeScript</b>.<br/>
+  Manage daily tasks easily with smooth performance, simple UI, and offline support.
+</p>
 
-## Get started
+<p align="center">
+  <a href="https://github.com/VenMeku/VenMeku-Todo-ReactNative">
+    <img src="https://img.shields.io/badge/Version-1.0.0-blue" alt="Version"/>
+  </a>
+  <a href="https://github.com/VenMeku/VenMeku-Todo-ReactNative/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green" alt="License"/>
+  </a>
+  <a href="https://reactnative.dev/">
+    <img src="https://img.shields.io/badge/React_Native-0.72-blue?logo=react" alt="React Native"/>
+  </a>
+  <a href="https://www.typescriptlang.org/">
+    <img src="https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript" alt="TypeScript"/>
+  </a>
+  <a href="https://github.com/VenMeku/VenMeku-Todo-ReactNative/issues">
+    <img src="https://img.shields.io/badge/Issues-Open-orange" alt="Issues"/>
+  </a>
+</p>
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+# 📝 VenMeku Todo — React Native App
 
-2. Start the app
+[![Version](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/VenMeku/VenMeku-Todo-ReactNative)
+[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/VenMeku/VenMeku-Todo-ReactNative/blob/main/LICENSE)
+[![React Native](https://img.shields.io/badge/React_Native-0.72-blue?logo=react)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Issues](https://img.shields.io/badge/Issues-Open-orange)](https://github.com/VenMeku/VenMeku-Todo-ReactNative/issues)
 
-   ```bash
-   npx expo start
-   ```
+A sleek and modern **To-Do app** built with **React Native** and **TypeScript**.  
+Manage daily tasks easily with smooth performance, simple UI, and offline support.
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🌟 Features
+- ✅ Task Management: Add, Edit, Delete, Mark as Done  
+- 🔒 User Authentication: Login, Signup, Logout  
+- 🖼️ Profile: Upload photo and display user name  
+- 💾 Offline Storage: AsyncStorage for local persistence  
+- ⚙️ Settings: App info, Feedback, Version  
+- 📲 Responsive UI with smooth animations  
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🎥 Demo / GIF
+![App Demo](./screenshots/demo.gif)  
+*Replace `demo.gif` with an actual recording of your app in action*
 
-When you're ready, run:
+---
+
+## 🧑‍💻 Tech Stack
+| Technology | Description |
+|------------|-------------|
+| ⚛️ React Native | Cross-platform mobile development |
+| 💙 TypeScript | Type-safe, scalable code |
+| 💾 AsyncStorage | Local data storage |
+| 🎨 React Native Paper / Gesture Handler | Optional UI & animations |
+
+---
+
+## 📱 Screenshots
+| Login | Home | Profile | Settings |
+|:--:|:--:|:--:|:--:|
+| ![Login](./screenshots/login.png) | ![Home](./screenshots/home.png) | ![Profile](./screenshots/profile.png) | ![Settings](./screenshots/settings.png) |
+
+---
+
+## ⚙️ Installation & Setup
 
 ```bash
-npm run reset-project
-```
+# 1. Clone the repo
+git clone https://github.com/VenMeku/VenMeku-Todo-ReactNative.git
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+# 2. Move into the folder
+cd VenMeku-Todo-ReactNative
 
-## Learn more
+# 3. Install dependencies
+npm install
 
-To learn more about developing your project with Expo, look at the following resources:
+# 4. Run the app on Android
+npx react-native run-android
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# OR Run on iOS (if MacOS)
+npx react-native run-ios
 
-## Join the community
 
-Join our community of developers creating universal apps.
+## 📂 Folder Structure
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+VenMeku-Todo-ReactNative/
+│
+├── src/
+│ ├── components/ # Reusable UI components
+│ ├── screens/ # App screens (Login, Home, Profile, Settings)
+│ ├── navigation/ # Stack & Tab navigation
+│ ├── utils/ # Helper functions
+│ └── storage/ # AsyncStorage utilities
+│
+├── screenshots/ # App screenshots & demo GIF
+│ ├── login.png
+│ ├── home.png
+│ ├── profile.png
+│ ├── settings.png
+│ └── demo.gif
+│
+├── App.tsx
+├── package.json
+└── README.md
+
+
+
+
+
+
+
+
+---
+
+## 🌍 About the Developer
+
+👨‍💻 **Developer:** Mekuanint (Meku)  
+📱 **Version:** 1.0.0  
+💬 **Built With:** React Native & TypeScript  
+📧 **Contact:** [venapp@gmail.com](mailto:venapp@gmail.com)  
+🔗 **GitHub:** [VenMeku](https://github.com/VenomX-Meku)
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+```bash
+# 1. Fork the Project
+# 2. Create your Feature Branch
+git checkout -b feature/AmazingFeature
+
+# 3. Commit your Changes
+git commit -m 'Add some AmazingFeature'
+
+# 4. Push to the Branch
+git push origin feature/AmazingFeature
+
+# 5. Open a Pull Request
+
+
+
+⭐ If you like this project, please give it a star on GitHub!  
