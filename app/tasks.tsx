@@ -1,25 +1,21 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function TasksScreen() {
   const router = useRouter();
 
-  const [tasks, setTasks] = useState([
-    { id: 1, text: "Finish React Native tutorial" },
-    { id: 2, text: "Write project plan" },
-    { id: 3, text: "Prepare presentation" },
-  ]);
-
+  const [tasks, setTasks] = useState<{ id: number; text: string }[]>([]);
   const [newTask, setNewTask] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<{ id: number; text: string } | null>(null);
@@ -32,6 +28,41 @@ export default function TasksScreen() {
     "Your future is created by what you do today, not tomorrow.",
     "Discipline is choosing between what you want now and what you want most.",
   ];
+
+  // Load tasks from AsyncStorage on app start
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const savedTasks = await AsyncStorage.getItem("tasks");
+        if (savedTasks) {
+          setTasks(JSON.parse(savedTasks));
+        } else {
+          const defaultTasks = [
+            { id: 1, text: "Finish React Native tutorial" },
+            { id: 2, text: "Write project plan" },
+            { id: 3, text: "Prepare presentation" },
+          ];
+          setTasks(defaultTasks);
+          await AsyncStorage.setItem("tasks", JSON.stringify(defaultTasks));
+        }
+      } catch (error) {
+        console.log("Error loading tasks:", error);
+      }
+    };
+    loadTasks();
+  }, []);
+
+  // Save tasks whenever they change
+  useEffect(() => {
+    const saveTasks = async () => {
+      try {
+        await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
+      } catch (error) {
+        console.log("Error saving tasks:", error);
+      }
+    };
+    saveTasks();
+  }, [tasks]);
 
   const changeQuote = () => {
     const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -169,26 +200,16 @@ export default function TasksScreen() {
         style={styles.backButton}
         onPress={() => router.push("/")}
       >
-        <Text style={styles.backButtonText}>🏠 Back to Home</Text>
+        <Text style={styles.backButtonText}>🏠  Home ➡</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#E7F0FA", // Container background visible
-    padding: 20,
-    paddingTop: 50,
-  },
+  container: { flex: 1, backgroundColor: "#E7F0FA", padding: 20, paddingTop: 50 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 8, color: "#1E3A8A" },
-  taskCounter: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 15,
-    color: "#333",
-  },
+  taskCounter: { fontSize: 16, fontWeight: "600", marginBottom: 15, color: "#333" },
   quoteSection: {
     backgroundColor: "#fff",
     padding: 18,
@@ -201,19 +222,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  quote: {
-    fontSize: 14,
-    fontStyle: "italic",
-    color: "#1E3A8A",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  quoteButton: {
-    backgroundColor: "#1E3A8A",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
+  quote: { fontSize: 14, fontStyle: "italic", color: "#1E3A8A", textAlign: "center", marginBottom: 8 },
+  quoteButton: { backgroundColor: "#1E3A8A", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   quoteButtonText: { color: "#fff", fontWeight: "bold", fontSize: 12 },
   addTaskSection: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
   input: {
@@ -232,85 +242,22 @@ const styles = StyleSheet.create({
     elevation: 2,
     minHeight: 50,
   },
-  addButton: {
-    backgroundColor: "#1E3A8A",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
+  addButton: { backgroundColor: "#1E3A8A", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 },
   addButtonText: { color: "#fff", fontWeight: "bold" },
   taskList: { marginTop: 10 },
-  taskItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#D9E6F2", // ✅ Changed from white, now visible
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 10,
-    alignItems: "center",
-  },
+  taskItem: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#D9E6F2", padding: 14, borderRadius: 12, marginBottom: 10, alignItems: "center" },
   taskText: { fontSize: 16, flex: 1, color: "#333" },
   taskActions: { flexDirection: "row", gap: 12 },
-  iconButton: {
-    padding: 6,
-    borderRadius: 8,
-    backgroundColor: "#F0F4FF",
-  },
+  iconButton: { padding: 6, borderRadius: 8, backgroundColor: "#F0F4FF" },
   editText: { fontSize: 18, color: "#007BFF" },
   deleteText: { fontSize: 18, color: "#FF3B30" },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "85%",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 22,
-    elevation: 6,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#1E3A8A",
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#999",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 18,
-    textAlignVertical: "top",
-    minHeight: 60,
-  },
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", alignItems: "center" },
+  modalContent: { width: "85%", backgroundColor: "#fff", borderRadius: 12, padding: 22, elevation: 6 },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 12, color: "#1E3A8A" },
+  modalInput: { borderWidth: 1, borderColor: "#999", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 18, textAlignVertical: "top", minHeight: 60 },
   modalButtons: { flexDirection: "row", justifyContent: "space-between" },
-  modalButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 10,
-    marginHorizontal: 5,
-    alignItems: "center",
-  },
+  modalButton: { flex: 1, padding: 12, borderRadius: 10, marginHorizontal: 5, alignItems: "center" },
   modalButtonText: { color: "#fff", fontWeight: "bold" },
-  backButton: {
-    position: "absolute",
-    bottom: 30,
-    left: 20,
-    right: 20,
-    backgroundColor: "#1E3A8A",
-    paddingVertical: 14,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
-  },
+  backButton: { position: "absolute", bottom: 200, left: 200, right: 0, backgroundColor: "#1E3A8A", paddingVertical: 10, borderRadius: 16, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 20, height: 26 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 6 },
   backButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });

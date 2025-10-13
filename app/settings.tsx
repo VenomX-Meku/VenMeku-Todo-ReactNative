@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -9,15 +10,18 @@ import {
 } from "react-native";
 
 export default function SettingsScreen() {
+  const router = useRouter(); // For navigation
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
-  const [privateAccount, setPrivateAccount] = useState(false);
   const [language, setLanguage] = useState("English");
 
   // Toggle between English and Amharic
   const changeLanguage = () => {
     setLanguage((prev) => (prev === "English" ? "Amharic" : "English"));
-    Alert.alert("🌍 Language Changed", `Now using ${language === "English" ? "Amharic" : "English"}`);
+    Alert.alert(
+      "🌍 Language Changed",
+      `Now using ${language === "English" ? "Amharic" : "English"}`
+    );
   };
 
   return (
@@ -27,6 +31,14 @@ export default function SettingsScreen() {
         { backgroundColor: darkMode ? "#1a1a1a" : "#fff5e1" },
       ]}
     >
+      {/* Back Button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.back()}
+      >
+        <Text style={styles.backText}>⬅ Back</Text>
+      </TouchableOpacity>
+
       <Text
         style={[
           styles.title,
@@ -62,19 +74,6 @@ export default function SettingsScreen() {
         />
       </View>
 
-      {/* Private Account */}
-      <View style={styles.row}>
-        <Text style={[styles.label, { color: darkMode ? "#fff" : "#333" }]}>
-          Private Account
-        </Text>
-        <Switch
-          value={privateAccount}
-          onValueChange={setPrivateAccount}
-          thumbColor={privateAccount ? "#94560aff" : "#f4f3f4"}
-          trackColor={{ true: "#caa46d", false: "#ccc" }}
-        />
-      </View>
-
       {/* Language Selector */}
       <TouchableOpacity
         style={[
@@ -103,93 +102,33 @@ export default function SettingsScreen() {
           { backgroundColor: darkMode ? "#2c2c2c" : "#fff" },
         ]}
       >
-
-
-
-<Text
-          style={[
-            styles.infoText,
-            { color: darkMode ? "#bbb" : "#555", fontSize: 40, },
-          ]}
+        <Text
+          style={[styles.infoText, { color: darkMode ? "#bbb" : "#555", fontSize: 40 }]}
         >
-          
-💻 
-
-
-
+          💻
         </Text>
-
-
- <Text
-          style={[
-            styles.infoText,
-            { color: darkMode ? "#bbb" : "#555" },
-          ]}
-        >
-          
-
-👨‍💻 Developed by: Mekuanint (Meku)
-
-
-        </Text>
-
-
-
 
         <Text
-          style={[
-            styles.infoText,
-            { color: darkMode ? "#fff" : "#333" },
-          ]}
+          style={[styles.infoText, { color: darkMode ? "#bbb" : "#555" }]}
         >
+          👨‍💻 Developed by: Mekuanint (Meku)
+        </Text>
 
-
+        <Text style={[styles.infoText, { color: darkMode ? "#fff" : "#333" }]}>
           📱 App Version: <Text style={styles.highlight}>1.0.0</Text>
         </Text>
 
-
-
-
-
-
-<Text
-          style={[
-            styles.infoText,
-            { color: darkMode ? "#bbb" : "#555" },
-          ]}
-        >
-💙 Built with: React Native & TypeScript
-
+        <Text style={[styles.infoText, { color: darkMode ? "#bbb" : "#555" }]}>
+          💙 Built with: React Native & TypeScript
         </Text>
 
-
-
-<Text
-          style={[
-            styles.infoText,
-            { color: darkMode ? "#bbb" : "#555" },
-          ]}
-        >
-📧 Support: venapp@gmail.com
-
+        <Text style={[styles.infoText, { color: darkMode ? "#bbb" : "#555" }]}>
+          📧 Support: venapp@gmail.com
         </Text>
 
-
-
-<Text
-          style={[
-            styles.infoText,
-            { color: darkMode ? "#bbb" : "#555" },
-          ]}
-        >
-© 2025 VenMeku Tech — All rights reserved.
-
+        <Text style={[styles.infoText, { color: darkMode ? "#bbb" : "#555" }]}>
+          © 2025 VenMeku Tech — All rights reserved.
         </Text>
-
-
-
-
-
       </View>
     </View>
   );
@@ -201,6 +140,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingHorizontal: 30,
     paddingTop: 50,
+  },
+  backButton: {
+    marginBottom: 20,
+  },
+  backText: {
+    fontSize: 16,
+    color: "#94560aff",
+    fontWeight: "bold",
   },
   title: {
     fontSize: 28,

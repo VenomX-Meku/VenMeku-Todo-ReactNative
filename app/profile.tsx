@@ -1,213 +1,324 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
-  Modal,
+  Image,
+  ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
-type Task = { id: number; text: string };
-
-export default function TasksScreen() {
+export default function Profile() {
   const router = useRouter();
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [darkMode, setDarkMode] = useState(false);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState("");
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-  const [editText, setEditText] = useState("");
-
-  const [quote, setQuote] = useState("Stay focused and finish what you started!");
-  const quotes = [
-    "Success is the sum of small efforts repeated daily.",
-    "Don’t watch the clock; do what it does. Keep going.",
-    "Your future is created by what you do today, not tomorrow.",
-    "Discipline is choosing between what you want now and what you want most.",
-  ];
-
-  // Load tasks from AsyncStorage on mount
+  // Load user data from AsyncStorage
   useEffect(() => {
-    const loadTasks = async () => {
+    const loadUser = async () => {
       try {
-        const storedTasks = await AsyncStorage.getItem("@tasks");
-        if (storedTasks) setTasks(JSON.parse(storedTasks));
-        else {
-          // default tasks
-          setTasks([
-            { id: 1, text: "Finish React Native tutorial" },
-            { id: 2, text: "Write project plan" },
-            { id: 3, text: "Prepare presentation" },
-          ]);
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          setName(parsed.name || "");
+          setEmail(parsed.email || "");
+          setPhotoUri(parsed.photoUri || null);
         }
-      } catch (e) {
-        console.log("Failed to load tasks", e);
+      } catch (err) {
+        console.log("Error loading user:", err);
       }
     };
-    loadTasks();
+    loadUser();
   }, []);
 
-  // Save tasks to AsyncStorage whenever they change
-  useEffect(() => {
-    const saveTasks = async () => {
-      try {
-        await AsyncStorage.setItem("@tasks", JSON.stringify(tasks));
-      } catch (e) {
-        console.log("Failed to save tasks", e);
-      }
-    };
-    saveTasks();
-  }, [tasks]);
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
-  const changeQuote = () => {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    setQuote(quotes[randomIndex]);
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission required", "Access to photos is needed.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setPhotoUri(result.assets[0].uri);
+    }
   };
 
-  const addTask = () => {
-    if (!newTask.trim()) return;
-    setTasks([...tasks, { id: Date.now(), text: newTask }]);
-    setNewTask("");
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission required", "Access to camera is needed.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setPhotoUri(result.assets[0].uri);
+    }
   };
 
-  const deleteTask = (id: number) => {
-    Alert.alert("Delete Task", "Are you sure you want to delete this task?", [
+  const handleSave = async () => {
+    if (!name.trim() || !email.trim()) {
+      Alert.alert("⚠️ Error", "Name and Email cannot be empty.");
+      return;
+    }
+
+    try {
+      const userData = {
+        name: name.trim(),
+        email: email.trim(),
+        photoUri: photoUri,
+      };
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+      setName(userData.name);
+      setEmail(userData.email);
+      setPhotoUri(userData.photoUri);
+
+      Alert.alert("✅ Saved", "Your profile changes have been saved!");
+    } catch (error) {
+      console.log("Error saving profile:", error);
+      Alert.alert("❌ Error", "Failed to save profile changes.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("user");
+      Alert.alert("Logged Out", "You have been logged out successfully!");
+      router.replace("/");
+    } catch (error) {
+      console.log("Error logging out:", error);
+    }
+  };
+
+  const handleChangePhoto = () => {
+    Alert.alert("Profile Photo", "Choose an option", [
+      { text: "Take Photo", onPress: takePhoto },
+      { text: "Choose from Gallery", onPress: pickImage },
       { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => setTasks(tasks.filter((t) => t.id !== id)),
-      },
     ]);
   };
 
-  const openEditModal = (task: Task) => {
-    setTaskToEdit(task);
-    setEditText(task.text);
-    setEditModalVisible(true);
-  };
-
-  const saveEdit = () => {
-    if (!taskToEdit || !editText.trim()) return;
-    setTasks(tasks.map((t) => (t.id === taskToEdit.id ? { ...t, text: editText } : t)));
-    setEditModalVisible(false);
-    setTaskToEdit(null);
-    setEditText("");
-  };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>📝 VenMeku Task Screen</Text>
-      <Text style={styles.taskCounter}>Pending Tasks: {tasks.length}</Text>
+    <View style={[styles.container, darkMode && styles.containerDark]}>
+      <View style={styles.glowCircle1} />
+      <View style={styles.glowCircle2} />
 
-      {/* Quote Section */}
-      <View style={styles.quoteSection}>
-        <Text style={styles.quote}>{quote}</Text>
-        <TouchableOpacity style={styles.quoteButton} onPress={changeQuote}>
-          <Text style={styles.quoteButtonText}>🔄 New Quote</Text>
+      {/* Top Bar */}
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
+
+        <View style={styles.darkModeToggle}>
+          <Switch
+            value={darkMode}
+            onValueChange={toggleDarkMode}
+            thumbColor={darkMode ? "#fff" : "#ff9100"}
+            trackColor={{ true: "#333", false: "#ccc" }}
+          />
+        </View>
       </View>
 
-      {/* Add Task */}
-      <View style={styles.addTaskSection}>
-        <TextInput
-          style={styles.input}
-          placeholder="Add new task..."
-          value={newTask}
-          onChangeText={setNewTask}
-          multiline
-          textAlignVertical="top"
-          maxLength={500}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={addTask}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Task List */}
-      <FlatList
-        style={styles.taskList}
-        data={tasks}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.taskItem}>
-            <Text style={styles.taskText}>{item.text}</Text>
-            <View style={styles.taskActions}>
-              <TouchableOpacity style={styles.iconButton} onPress={() => openEditModal(item)}>
-                <Text style={styles.editText}>✏️</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton} onPress={() => deleteTask(item.id)}>
-                <Text style={styles.deleteText}>🗑️</Text>
-              </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Profile Picture */}
+        <TouchableOpacity
+          style={styles.photoWrapper}
+          onPress={handleChangePhoto}
+          activeOpacity={0.8}
+        >
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.photo} />
+          ) : (
+            <View style={styles.placeholderPhoto}>
+              <Text style={{ color: "#fff" }}>Add Photo</Text>
             </View>
-          </View>
-        )}
-      />
+          )}
+        </TouchableOpacity>
 
-      {/* Edit Modal */}
-      <Modal visible={editModalVisible} transparent animationType="fade" onRequestClose={() => setEditModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>✏️ Edit Task</Text>
+        {/* Info Section: Name and Email Side by Side */}
+        <View style={styles.infoSectionHorizontal}>
+          <View style={styles.inputWrapper}>
+            <Text style={[styles.label, darkMode && styles.textDark]}>Name</Text>
             <TextInput
-              style={styles.modalInput}
-              value={editText}
-              onChangeText={setEditText}
-              multiline
-              textAlignVertical="top"
-              maxLength={500}
+              style={[styles.input, darkMode && styles.inputDark]}
+              placeholder="Enter your name"
+              placeholderTextColor="#999"
+              value={name}
+              onChangeText={setName}
             />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.modalButton, { backgroundColor: "#007BFF" }]} onPress={saveEdit}>
-                <Text style={styles.modalButtonText}>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalButton, { backgroundColor: "#FF3B30" }]} onPress={() => setEditModalVisible(false)}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <Text style={[styles.label, darkMode && styles.textDark]}>Email</Text>
+            <TextInput
+              style={[styles.input, darkMode && styles.inputDark]}
+              placeholder="Enter your email"
+              placeholderTextColor="#999"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
           </View>
         </View>
-      </Modal>
 
-      {/* Back to Home */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push("/")}>
-        <Text style={styles.backButtonText}>🏠 Back to Home</Text>
-      </TouchableOpacity>
+        {/* Buttons at bottom */}
+        <View style={styles.buttonsBottom}>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveText}>💾 Save Changes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>🚪 Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#E7F0FA", padding: 20, paddingTop: 50 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 8, color: "#1E3A8A" },
-  taskCounter: { fontSize: 16, fontWeight: "600", marginBottom: 15, color: "#333" },
-  quoteSection: { backgroundColor: "#fff", padding: 18, borderRadius: 12, marginBottom: 20, alignItems: "center", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 3 },
-  quote: { fontSize: 14, fontStyle: "italic", color: "#1E3A8A", textAlign: "center", marginBottom: 8 },
-  quoteButton: { backgroundColor: "#1E3A8A", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  quoteButtonText: { color: "#fff", fontWeight: "bold", fontSize: 12 },
-  addTaskSection: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
-  input: { flex: 1, borderWidth: 1, borderColor: "#1E3A8A", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, marginRight: 10, backgroundColor: "#fff", minHeight: 50 },
-  addButton: { backgroundColor: "#1E3A8A", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 },
-  addButtonText: { color: "#fff", fontWeight: "bold" },
-  taskList: { marginTop: 10 },
-  taskItem: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#D9E6F2", padding: 14, borderRadius: 12, marginBottom: 10, alignItems: "center" },
-  taskText: { fontSize: 16, flex: 1, color: "#333" },
-  taskActions: { flexDirection: "row", gap: 12 },
-  iconButton: { padding: 6, borderRadius: 8, backgroundColor: "#F0F4FF" },
-  editText: { fontSize: 18, color: "#007BFF" },
-  deleteText: { fontSize: 18, color: "#FF3B30" },
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", alignItems: "center" },
-  modalContent: { width: "85%", backgroundColor: "#fff", borderRadius: 12, padding: 22 },
-  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 12, color: "#1E3A8A" },
-  modalInput: { borderWidth: 1, borderColor: "#999", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 18, textAlignVertical: "top", minHeight: 60 },
-  modalButtons: { flexDirection: "row", justifyContent: "space-between" },
-  modalButton: { flex: 1, padding: 12, borderRadius: 10, marginHorizontal: 5, alignItems: "center" },
-  modalButtonText: { color: "#fff", fontWeight: "bold" },
-  backButton: { position: "absolute", bottom: 30, left: 20, right: 20, backgroundColor: "#1E3A8A", paddingVertical: 14, borderRadius: 30, alignItems: "center", justifyContent: "center" },
-  backButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-});
+  container: {
+    flex: 1,
+    backgroundColor: "#203c58ff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  containerDark: {
+    backgroundColor: "#1a1a1a",
+  },
+  glowCircle1: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    backgroundColor: "#ffde9c",
+    borderRadius: 125,
+    opacity: 0.15,
+    top: 60,
+    left: 40,
+  },
+  glowCircle2: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    backgroundColor: "#94560a",
+    borderRadius: 150,
+    opacity: 0.1,
+    bottom: 60,
+    right: 40,
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "90%",
+    marginTop: 50,
+  },
+  backText: { color: "#FFD166", fontSize: 16, fontWeight: "bold" },
+  darkModeToggle: { marginLeft: 10 },
+  scrollContent: {
+    alignItems: "center",
+    paddingBottom: 50,
+    justifyContent: "space-between",
+    flexGrow: 1,
+  },
+  photoWrapper: {
+    marginTop: 40,
+    marginBottom: 40, // pull text field slightly down
+  },
+  photo: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: "#FFD166",
+  },
+  placeholderPhoto: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#666",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFD166",
+  },
+  infoSectionHorizontal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "85%",
+    marginBottom: 40, // push buttons down
+  },
+  inputWrapper: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  label: {
+    fontSize: 14,
+    color: "#fff",
+    marginBottom: 6,
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  inputDark: {
+    backgroundColor: "#2a2a2a",
+    color: "#fff",
+  },
+  buttonsBottom: {
+    width: "85%",
+    marginBottom: 100, // bottom space
+    alignItems: "center",
+  },
+  saveButton: {
+    backgroundColor: "#ff9100",
+    paddingVertical: 10,
+    paddingHorizontal: 35,
+    borderRadius: 15,
+    width: "70%",
+    marginBottom: 25,
+  },
+  saveText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+    textAlign: "center",
+  },
+  logoutButton: {
+    backgroundColor: "#d32f2f",
+    paddingVertical: 10,
+    paddingHorizontal: 35,
+    borderRadius: 20,
+    width: "60%",
+  },
+  logoutText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+    textAlign: "center",
+  }, 
+  textDark: { color: "#fff" },
+});   
