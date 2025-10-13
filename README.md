@@ -69,8 +69,20 @@ Manage daily tasks easily with smooth performance, simple UI, and offline suppor
 
 ## 📱 Screenshots
 | Login | Home | Profile | Settings |
-|:--:|:--:|:--:|:--:|
-| ![Login](./screenshots/login.png) | ![Home](./screenshots/home.png) | ![Profile](./screenshots/profile.png) | ![Settings](./screenshots/settings.png) |
+|:--:|:--:|:--:|:--:|  
+![Signup](https://github.com/user-attachments/assets/81b13edf-b56d-4efb-afdd-192076d99195) 
+![Login](https://github.com/user-attachments/assets/3fa16b13-83e8-422c-97e5-f0d6ca51ef38)  
+![Home](https://github.com/user-attachments/assets/151ef557-d4a2-422d-831f-6128c19d879d)
+![Home1](https://github.com/user-attachments/assets/73d18b96-668c-41ea-983d-9f08a8ae16c2)  
+![Profile](https://github.com/user-attachments/assets/702f2a40-9b71-4a54-a9f6-4114b1736712)
+![Profile1](https://github.com/user-attachments/assets/7f5c6e43-1744-4ff3-9d7d-220f4339707e)   
+![Task](https://github.com/user-attachments/assets/7672bf18-1028-4f2a-a6a6-12691430a7eb)   
+![Task-Detail](https://github.com/user-attachments/assets/69c31d05-3948-495f-a182-958174fb08ac)  
+![Setting](https://github.com/user-attachments/assets/358e8d76-5145-4293-b3d9-4c8b9b36fc0d)
+
+
+
+
 
 ---
 
