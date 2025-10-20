@@ -291,4 +291,9 @@ const styles = StyleSheet.create({
   refreshText: { color: "#fff", fontWeight: "bold" },
   logoutButton: { backgroundColor: "#d32f2f", padding: 10, borderRadius: 15, marginTop: 20 },
   logoutText: { color: "#fff", fontWeight: "bold", fontSize: 14 },
+
+
+  
 });
+
+

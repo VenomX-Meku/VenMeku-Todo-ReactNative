@@ -4,11 +4,11 @@ import { StatusBar } from "expo-status-bar"; // 🔸 NEW
 import { useEffect } from "react"; // 🔸 NEW
 
 export default function RootLayout() {
-  // 🔸 Prevent splash from hiding automatically and hide after 3 seconds
+  // 🔸 Prevent splash from hiding automatically and hide after 2 seconds
   useEffect(() => {
     const prepare = async () => {
       await SplashScreen.preventAutoHideAsync();
-      await new Promise(resolve => setTimeout(resolve, 3000)); // 3 seconds
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds
       await SplashScreen.hideAsync();
     };
     prepare();
