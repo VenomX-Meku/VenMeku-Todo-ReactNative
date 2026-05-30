@@ -22,9 +22,7 @@ Manage daily tasks easily with smooth performance, simple UI, and offline suppor
 
 ---
 
-## 📱 Screenshots
-| Login | Home | Profile | Settings |
-|:--:|:--:|:--:|:--:|
+
 
 
 ---
