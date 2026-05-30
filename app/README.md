@@ -25,7 +25,7 @@ Manage daily tasks easily with smooth performance, simple UI, and offline suppor
 ## 📱 Screenshots
 | Login | Home | Profile | Settings |
 |:--:|:--:|:--:|:--:|
-| ![Login](./screenshots/login.png) | ![Home](./screenshots/home.png) | ![Profile](./screenshots/profile.png) | ![Settings](./screenshots/settings.png) |
+| ![Home](./screenshots/home.png) |  | ![Settings](./screenshots/settings.png) |
 
 ---
 
