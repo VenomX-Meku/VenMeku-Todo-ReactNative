@@ -51,9 +51,6 @@ Manage daily tasks easily with smooth performance, simple UI, and offline suppor
 
 ---
 
-## 🎥 Demo / GIF
-![App Demo](./screenshots/demo.gif)  
-*Replace `demo.gif` with an actual recording of your app in action*
 
 ---
 
