@@ -28,16 +28,7 @@
 
 ---
 
-# 📝 VenMeku Todo — React Native App
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/VenMeku/VenMeku-Todo-ReactNative)
-[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/VenMeku/VenMeku-Todo-ReactNative/blob/main/LICENSE)
-[![React Native](https://img.shields.io/badge/React_Native-0.72-blue?logo=react)](https://reactnative.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Issues](https://img.shields.io/badge/Issues-Open-orange)](https://github.com/VenMeku/VenMeku-Todo-ReactNative/issues)
-
-A sleek and modern **To-Do app** built with **React Native** and **TypeScript**.  
-Manage daily tasks easily with smooth performance, simple UI, and offline support.
 
 ---
 
